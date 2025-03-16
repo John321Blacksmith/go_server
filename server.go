@@ -1,34 +1,64 @@
 package main
 
 import (
-	"flag"
 	"fmt"
-	"os"
+	"log"
+	"net/http"
 )
 
-type Book struct {
-	Id       string `json:"id"`
-	Title    string `json:"title"`
-	Author   string `json:"author"`
-	Price    string `json:"price"`
-	ImageUrl string `json:"image_url"`
+// define a listening port
+const PORT string = ":8000"
+
+// starting the server
+// and handling the incoming
+// requests
+func main() {
+	// define handling
+	http.HandleFunc("/", handleGetBooksList)
+
+	http.HandleFunc("/book", handleGetBookObject)
+
+	http.HandleFunc("/update", handleUpdateBook)
+
+	http.HandleFunc("/add", handleAddBook)
+
+	http.HandleFunc("/delete", handleDeleteBook)
+
+	fmt.Printf("Server is listening on port %v\n", PORT)
+
+	// launching the server
+	err := http.ListenAndServe(PORT, nil)
+
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
-func main() {
-	getCmd := flag.NewFlagSet("get", flag.ExitOnError)
-	getAll := getCmd.Bool("all", false, "List all the books")
-	getOne := getCmd.String("id", "", "Get one book by ID")
+// handle a request for
+// a books list
+func handleGetBooksList(w http.ResponseWriter, r *http.Request) {
+}
 
-	if len(os.Args[0]) < 2 {
-		fmt.Println("Please specify a flag")
-		os.Exit(1)
-	}
+// handle a request for
+// a book object
+func handleGetBookObject(w http.ResponseWriter, r *http.Request) {
 
-	switch os.Args[0] {
-	case "get":
-		handleGetAll(getCmd, getAll, getOne)
-	default:
-		fmt.Println("No valid commands were provided")
-	}
+}
+
+// handle a request for
+// book update
+func handleUpdateBook(w http.ResponseWriter, r *http.Request) {
+
+}
+
+// handle a request
+// for book creation
+func handleAddBook(w http.ResponseWriter, r *http.Request) {
+
+}
+
+// handle a reqeust for
+// book deletion
+func handleDeleteBook(w http.ResponseWriter, r *http.Request) {
 
 }

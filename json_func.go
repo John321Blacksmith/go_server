@@ -6,13 +6,13 @@ import (
 )
 
 func GetBooks() ([]Book, error) {
-	var books []Book = []Book{}
+	var books []Book
 	// Get a list of all the books
 	file_bytes, err := os.ReadFile("./books.json")
 	if err != nil {
 		return nil, err
 	} else {
-		err = json.Unmarshal(file_bytes, books)
+		err = json.Unmarshal(file_bytes, &books)
 		if err != nil {
 			return nil, err
 		}
