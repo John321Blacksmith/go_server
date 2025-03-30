@@ -1,4 +1,4 @@
-package main
+package infra
 
 // book object model
 type Book struct {
