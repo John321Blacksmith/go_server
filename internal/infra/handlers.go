@@ -10,7 +10,7 @@ import (
 // get a list of books
 func getBooksList() ([]Book, error) {
 	var books []Book
-	file_bytes, err := os.ReadFile("./books.json")
+	file_bytes, err := os.ReadFile("../books_data.json")
 	if err != nil {
 		return nil, err
 	} else {
@@ -48,7 +48,7 @@ func GetBooksList() ([]Book, error) {
 		return nil, err
 	} else {
 		if len(queryset) != 0 {
-			for i := 0; i < len(queryset); i++ {
+			for i := range len(queryset) {
 				books = append(books, queryset[i])
 			}
 		}

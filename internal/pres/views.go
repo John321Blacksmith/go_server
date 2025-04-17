@@ -1,10 +1,11 @@
-package main
+package pres
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
+
+	"books_api/internal/infra"
 )
 
 // define a listening port
@@ -23,10 +24,10 @@ func checkMethod(r *http.Request, meth string) bool {
 	return r.Method != meth
 }
 
-// handle a request for
+// Handle a request for
 // a books list
-func handleGetBooksList(w http.ResponseWriter, r *http.Request) {
-	books, err := GetBooksList()
+func HandleGetBooksList(w http.ResponseWriter, r *http.Request) {
+	books, err := infra.GetBooksList()
 	if err != nil {
 		log.Printf("Error: %v", err)
 		w.WriteHeader(500)
@@ -37,12 +38,12 @@ func handleGetBooksList(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// handle a request for
+// Handle a request for
 // a book object
-func handleGetBookObject(w http.ResponseWriter, r *http.Request) {
+func HandleGetBookObject(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 	id := query.Get("id")
-	book, _, err := GetBookObject(id)
+	book, _, err := infra.GetBookObject(id)
 	if err != nil {
 		log.Printf("Error: %v", err)
 		w.WriteHeader(500)
@@ -53,13 +54,13 @@ func handleGetBookObject(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// handle a request for
+// Handle a request for
 // book update
-func handleUpdateBook(w http.ResponseWriter, r *http.Request) {
+func HandleUpdateBook(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 	if checkMethod(r, "POST") {
 		id := query.Get("id")
-		book, err := UpdateBook(id, encodeData(r.Body))
+		book, err := infra.UpdateBook(id, encodeData(r.Body))
 		if err != nil {
 			log.Printf("Error: %v", err)
 			w.WriteHeader(500)
@@ -76,11 +77,11 @@ func handleUpdateBook(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// handle a request
+// Handle a request
 // for book creation
-func handleAddBook(w http.ResponseWriter, r *http.Request) {
+func HandleAddBook(w http.ResponseWriter, r *http.Request) {
 	if checkMethod(r, "POST") {
-		book, err := AddBook(encodeData(r.Body))
+		book, err := infra.AddBook(encodeData(r.Body))
 		if err != nil {
 			log.Printf("Error: %v", err)
 			w.WriteHeader(500)
@@ -97,13 +98,13 @@ func handleAddBook(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// handle a reqeust for
+// Handle a reqeust for
 // book deletion
-func handleDeleteBook(w http.ResponseWriter, r *http.Request) {
+func HandleDeleteBook(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 	if checkMethod(r, "DELETE") {
 		id := query.Get("id")
-		result, err := DeleteBook(id)
+		result, err := infra.DeleteBook(id)
 		if err != nil {
 			log.Printf("Error: %v", err)
 			w.WriteHeader(500)
@@ -113,30 +114,5 @@ func handleDeleteBook(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(204)
 			w.Write(encodeData(result))
 		}
-	}
-}
-
-// starting the server
-// and handling the incoming
-// requests
-func main() {
-	// define handling
-	http.HandleFunc("/", handleGetBooksList)
-
-	http.HandleFunc("/book", handleGetBookObject)
-
-	http.HandleFunc("/update", handleUpdateBook)
-
-	http.HandleFunc("/add", handleAddBook)
-
-	http.HandleFunc("/delete", handleDeleteBook)
-
-	fmt.Printf("Server is listening on port %v\n", PORT)
-
-	// launching the server
-	err := http.ListenAndServe(PORT, nil)
-
-	if err != nil {
-		log.Fatal(err)
 	}
 }
