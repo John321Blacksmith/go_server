@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"books_api/internal/infra"
+	"media_api/internal/infra"
 )
 
 // define a listening port
