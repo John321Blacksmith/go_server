@@ -14,12 +14,20 @@ import (
 type (
 	// main config
 	Config struct {
+		App  App
 		HTTP HTTP
+	}
+
+	// Application -.
+	App struct {
+		Name    string `env:"APP_NAME,required"`
+		Version string `env:"APP_VERSION,required"`
 	}
 
 	// HTTP -.
 	HTTP struct {
-		Port string
+		Port           string `env:"HTTP_PORT,required"`
+		UsePreforkMode bool   `env:"HTTP_USE_PREFORK_MODE" envDefault:"false"`
 	}
 )
 
