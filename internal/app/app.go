@@ -25,6 +25,6 @@ func Run(cfg *config.Config) {
 	// message_broker := message_broker.New()
 
 	// http server startup
-	server := httpserver.New(httpserver.Port(cfg.HTTP.Port))
+	server := httpserver.New(httpserver.Port(cfg.HTTP.Port), httpserver.Prefork(cfg.HTTP.UsePreforkMode))
 	server.Start()
 }
