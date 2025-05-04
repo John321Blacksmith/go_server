@@ -6,6 +6,7 @@
 package app
 
 import (
+	"log"
 	"media_api/config"
 	"media_api/pkg/httpserver"
 )
@@ -24,7 +25,13 @@ func Run(cfg *config.Config) {
 	// message broker startup
 	// message_broker := message_broker.New()
 
-	// http server startup
-	server := httpserver.New(httpserver.Port(cfg.HTTP.Port), httpserver.Prefork(cfg.HTTP.UsePreforkMode))
-	server.Start()
+	// initialization of the http server
+	server := httpserver.New(&cfg.HTTP)
+
+	// http server launch
+	log.Printf("Starting the server on port %v", cfg.HTTP.Port)
+	err := server.Start()
+	if err != nil {
+		log.Fatalf("Error occurred when starting the server: %v", err)
+	}
 }
