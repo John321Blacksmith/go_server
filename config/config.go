@@ -7,8 +7,9 @@ package config
 
 import (
 	"fmt"
+	"os"
 
-	"github.com/caarlos0/env/v11"
+	"github.com/joho/godotenv"
 )
 
 type (
@@ -26,16 +27,21 @@ type (
 
 	// HTTP -.
 	HTTP struct {
-		Port           string `env:"HTTP_PORT,required"`
-		UsePreforkMode bool   `env:"HTTP_USE_PREFORK_MODE" envDefault:"false"`
+		Host string `env:"HTTP_HOST,required"`
+		Port string `env:"HTTP_PORT,required"`
 	}
 )
 
 func NewConfig() (*Config, error) {
 	cfg := &Config{}
-	err := env.Parse(cfg)
+	err := godotenv.Load()
 	if err != nil {
 		return nil, fmt.Errorf("error when parsing configs: %w", err)
+	} else {
+		cfg.App.Name = os.Getenv("APP_NAME")
+		cfg.App.Version = os.Getenv("APP_VERSION")
+		cfg.HTTP.Host = os.Getenv("HTTP_HOST")
+		cfg.HTTP.Port = os.Getenv("HTTP_PORT")
 	}
 	return cfg, nil
 }
