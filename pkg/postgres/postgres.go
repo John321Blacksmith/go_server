@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"context"
+	"database/sql"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -25,13 +26,14 @@ type Postgres struct {
 	connAttempts int
 	connTimeout  time.Duration
 
+	db   *sql.DB
 	Pool *pgxpool.Pool
 }
 
 // function to return
 // a new instance of the
-// Postgres
-func New(url string) (*Postgres, error) {
+// Postgres Pool
+func NewPool(url string) (*Postgres, error) {
 	pg := &Postgres{
 		maxPoolSize:  _defaultMaxPoolSize,
 		connAttempts: _defaultConnectionAttempts,
@@ -61,9 +63,28 @@ func New(url string) (*Postgres, error) {
 	return pg, nil
 }
 
-// close active connection
-func (db *Postgres) Close() {
+// this function returns
+// a new Postgres DB
+func NewDB(url string) (*sql.DB, error) {
+	db, err := sql.Open("postgres", url)
+	if err != nil {
+		return nil, fmt.Errorf("error occurred while opening the DataBase: %w", err)
+	}
+	err = db.Ping()
+
+	return db, err
+}
+
+// close active connection pool
+func (db *Postgres) ClosePool() {
 	if db.Pool != nil {
 		db.Pool.Close()
+	}
+}
+
+// close active DB connection
+func (db *Postgres) CloseDB() {
+	if db.db != nil {
+		db.db.Close()
 	}
 }
