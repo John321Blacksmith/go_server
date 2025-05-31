@@ -5,8 +5,8 @@ package usecase
 
 import (
 	"context"
+	pg_repo "media_api/internal/adapter/repo/persistent"
 	"media_api/internal/entity"
-	pg_repo "media_api/internal/repo/persistent"
 )
 
 // define a structure

@@ -6,9 +6,10 @@
 package app
 
 import (
+	"fmt"
 	"log"
 	"media_api/config"
-	pg_repo "media_api/internal/repo/persistent"
+	pg_repo "media_api/internal/adapter/repo/persistent"
 	rental_usecase "media_api/internal/usecase"
 	http_server "media_api/pkg/httpserver"
 	pg_driver "media_api/pkg/postgres"
@@ -20,7 +21,16 @@ import (
 // usecases and DB repositories
 func Run(cfg *config.Config) {
 	// DB driver startup
-	pg, err := pg_driver.New(cfg)
+	pg, err := pg_driver.NewDB(
+		fmt.Sprintf(
+			"host=%s port=%d user=%s password=%s dbname=%s",
+			cfg.DataBase.Host,
+			cfg.DataBase.Port,
+			cfg.DataBase.User,
+			cfg.DataBase.Password,
+			cfg.DataBase.DB,
+		),
+	)
 	if err != nil {
 		log.Printf("Response from DB driver: %w", err)
 	}
@@ -30,7 +40,6 @@ func Run(cfg *config.Config) {
 	rental_repo := pg_repo.NewRepository(pg)
 	// usecase startup
 	rental_usecase := rental_usecase.New(rental_repo)
-
 	// message broker startup
 	// message_broker := message_broker.New()
 
@@ -41,6 +50,6 @@ func Run(cfg *config.Config) {
 	// http server launch
 	log.Printf("Starting the server on port %v", cfg.HTTP.Port)
 	if err = server.Start(); err != nil {
-		log.Fatalf("Error occurred when starting the server: %v", err)
+		log.Fatalf("error occurred when starting the server: %v", err)
 	}
 }

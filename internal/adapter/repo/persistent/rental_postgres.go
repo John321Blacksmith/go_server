@@ -4,21 +4,20 @@ package persistent
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 
 	"media_api/internal/entity"
-	"media_api/pkg/postgres"
 )
 
 // db repository
 type RentalRepository struct {
-	*postgres.Postgres
+	db *sql.DB
 }
 
 // instantiate a new
-// repository powered
-// by postgres driver
-func NewRepository(db *postgres.Postgres) *RentalRepository {
+// repository
+func NewRepository(db *sql.DB) *RentalRepository {
 	return &RentalRepository{db}
 }
 
@@ -36,7 +35,7 @@ func (repo *RentalRepository) GetFilmById(ctx context.Context, id int) (entity.F
 		WHERE
 			film_id = $1;
 	`
-	result := repo.Pool.QueryRow(ctx, query, id)
+	result := repo.db.QueryRow(query, id)
 
 	err := result.Scan(
 		&film.FilmId,
@@ -74,7 +73,7 @@ func (repo *RentalRepository) GetFilmsList(ctx context.Context) ([]entity.Film, 
 			film_id
 		LIMIT $1;
 	`
-	result, err := repo.Pool.Query(ctx, query, 20)
+	result, err := repo.db.Query(query, 20)
 
 	if err != nil {
 		return nil, fmt.Errorf("error occurred while getting DB data: %w", err)
