@@ -8,10 +8,10 @@ package app
 import (
 	"fmt"
 	"log"
-	"media_api/config"
+	cfg "media_api/config"
+	http_cfg "media_api/internal/adapter/delivery/http"
 	pg_repo "media_api/internal/adapter/repo/persistent"
 	rental_usecase "media_api/internal/usecase"
-	http_server "media_api/pkg/httpserver"
 	pg_driver "media_api/pkg/postgres"
 )
 
@@ -19,7 +19,7 @@ import (
 // injection of such depemdencies
 // as message broker, http server,
 // usecases and DB repositories
-func Run(cfg *config.Config) {
+func Run(cfg *cfg.Config) {
 	// DB driver startup
 	pg, err := pg_driver.NewDB(
 		fmt.Sprintf(
@@ -37,15 +37,17 @@ func Run(cfg *config.Config) {
 	defer pg.Close()
 
 	// repository startup
-	rental_repo := pg_repo.NewRepository(pg)
+	rentalRepo := pg_repo.NewRepository(pg)
 	// usecase startup
-	rental_usecase := rental_usecase.New(rental_repo)
-	// message broker startup
-	// message_broker := message_broker.New()
+	rentalUsecase := rental_usecase.New(rentalRepo)
 
-	// initialization of the http server
-	server := http_server.New(&cfg.HTTP)
-	server.Start()
+	// configuring and initialization
+	// of the HTTP server
+	server := http_cfg.ConfigureHttpServer(
+		&cfg.HTTP,
+		rentalRepo,
+		rentalUsecase,
+	)
 
 	// http server launch
 	log.Printf("Starting the server on port %v", cfg.HTTP.Port)
