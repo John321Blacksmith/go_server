@@ -19,11 +19,11 @@ import (
 // injection of such depemdencies
 // as message broker, http server,
 // usecases and DB repositories
-func Run(cfg *cfg.Config) {
+func Run(cfg *cfg.Config) error {
 	// DB driver startup
 	pg, err := pg_driver.NewDB(
 		fmt.Sprintf(
-			"host=%s port=%d user=%s password=%s dbname=%s",
+			"host=%s port=%v user=%s password=%s dbname=%s",
 			cfg.DataBase.Host,
 			cfg.DataBase.Port,
 			cfg.DataBase.User,
@@ -31,8 +31,9 @@ func Run(cfg *cfg.Config) {
 			cfg.DataBase.DB,
 		),
 	)
+	log.Println(cfg.DataBase)
 	if err != nil {
-		log.Printf("Response from DB driver: %w", err)
+		return fmt.Errorf("error occurred while connecting to the DB: %w", err)
 	}
 	defer pg.Close()
 
@@ -49,9 +50,9 @@ func Run(cfg *cfg.Config) {
 		rentalUsecase,
 	)
 
-	// http server launch
-	log.Printf("Starting the server on port %v", cfg.HTTP.Port)
-	if err = server.Start(); err != nil {
-		log.Fatalf("error occurred when starting the server: %v", err)
+	// server launch
+	if err := server.Start(); err != nil {
+		return fmt.Errorf("error starting the server: %w", err)
 	}
+	return nil
 }
