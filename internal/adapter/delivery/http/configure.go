@@ -21,10 +21,6 @@ func ConfigureHttpServer(
 	repo *repo.RentalRepository,
 	usecase *usecase.RentalUseCase,
 ) *ConfiguredHttpServer {
-	// #TODO:
-	//	add main handler
-	//	add subhandlers
-	//	put all subhandlers to the main one
 
 	server := server.New(http_config)
 	filmHandler := handling.New(usecase)
