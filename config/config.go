@@ -8,6 +8,8 @@ package config
 import (
 	"fmt"
 	"os"
+	"strconv"
+	"time"
 
 	"github.com/joho/godotenv"
 )
@@ -28,8 +30,10 @@ type (
 
 	// HTTP -.
 	HTTP struct {
-		Host string `env:"HTTP_HOST,required"`
-		Port string `env:"HTTP_PORT,required"`
+		Host         string        `env:"HTTP_HOST,required"`
+		Port         string        `env:"HTTP_PORT,required"`
+		ReadTimeout  time.Duration `env:"READ_TIMEOUT,required"`
+		WriteTimeout time.Duration `env:"WRITE_TIMEOUT,required"`
 	}
 
 	// DataBase -.
@@ -58,6 +62,25 @@ func NewConfig() (*Config, error) {
 		cfg.DataBase.DB = os.Getenv("POSTGRES_DB")
 		cfg.DataBase.Password = os.Getenv("POSTGRES_PASSWORD")
 		cfg.DataBase.User = os.Getenv("POSTGRES_USER")
+		err := convertNumericVars(cfg)
+
+		return nil, err
 	}
-	return cfg, nil
+
+}
+
+func convertNumericVars(cfg *Config) error {
+	strR, strW := os.Getenv("READ_TIMEOUT"), os.Getenv("WRITE_TIMEOUT")
+
+	intR, errR := strconv.Atoi(strR)
+	intW, errW := strconv.Atoi(strW)
+
+	if errR != nil || errW != nil {
+		return fmt.Errorf("error parsing numeric configs: %w, %w", errR, errW)
+	} else {
+		cfg.HTTP.ReadTimeout = time.Duration(intR)
+		cfg.HTTP.WriteTimeout = time.Duration(intW)
+	}
+
+	return nil
 }
