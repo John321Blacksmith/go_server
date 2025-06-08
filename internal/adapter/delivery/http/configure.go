@@ -3,12 +3,16 @@
 package http
 
 import (
+	"fmt"
 	cfg "media_api/config"
 	handling "media_api/internal/adapter/delivery/http/handler"
 	repo "media_api/internal/adapter/repo/persistent"
 	usecase "media_api/internal/usecase"
+	color "media_api/pkg"
 	server "media_api/pkg/httpserver"
 	"net/http"
+
+	"golang.org/x/exp/slog"
 )
 
 type ConfiguredHttpServer struct {
@@ -38,8 +42,10 @@ func ConfigureHttpServer(
 }
 
 func (s *ConfiguredHttpServer) Start() error {
-	if err := s.srv.ListenAndServe(); err != nil {
+	err := s.srv.ListenAndServe()
+	if err != nil {
 		return err
 	}
+	slog.Info(fmt.Sprintf(color.Yellow+"Server is being launched on port %v..."+color.Reset, s.srv.Addr))
 	return nil
 }
