@@ -4,10 +4,11 @@
 package main
 
 import (
-	"log"
-
+	"fmt"
 	"media_api/config"
 	"media_api/internal/app"
+
+	"golang.org/x/exp/slog"
 )
 
 // import the configs and
@@ -16,7 +17,10 @@ func main() {
 	cfg, err := config.NewConfig()
 
 	if err != nil {
-		log.Fatal(err)
+		slog.Info(fmt.Sprint(err))
 	}
-	app.Run(cfg)
+	err = app.Run(cfg)
+	if err != nil {
+		slog.Info(fmt.Sprintf("During application startup, an error occurred: %v", err))
+	}
 }
