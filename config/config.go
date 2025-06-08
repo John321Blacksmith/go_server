@@ -43,6 +43,7 @@ type (
 		DB       string `env:"POSTGRES_DB"`
 		Password string `env:"POSTGRES_PASSWORD"`
 		User     string `env:"POSTGRES_USER"`
+		SSL      string `env:"SSL"`
 	}
 )
 
@@ -62,9 +63,12 @@ func NewConfig() (*Config, error) {
 		cfg.DataBase.DB = os.Getenv("POSTGRES_DB")
 		cfg.DataBase.Password = os.Getenv("POSTGRES_PASSWORD")
 		cfg.DataBase.User = os.Getenv("POSTGRES_USER")
+		cfg.DataBase.SSL = os.Getenv("SSL")
 		err := convertNumericVars(cfg)
-
-		return nil, err
+		if err != nil {
+			return nil, err
+		}
+		return cfg, nil
 	}
 
 }
