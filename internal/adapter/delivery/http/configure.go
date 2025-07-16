@@ -1,51 +1,43 @@
-// configuring the server
+// // configuring the server
 
 package http
 
-import (
-	"fmt"
-	cfg "media_api/config"
-	handling "media_api/internal/adapter/delivery/http/handler"
-	repo "media_api/internal/adapter/repo/persistent"
-	usecase "media_api/internal/usecase"
-	color "media_api/pkg"
-	server "media_api/pkg/httpserver"
-	"net/http"
+// import (
+// 	cfg "media_api/config"
+// 	film_handling "media_api/internal/adapter/delivery/http/handler"
+// 	usecase "media_api/internal/usecase"
+// 	"net/http"
 
-	"golang.org/x/exp/slog"
-)
+// 	"github.com/rs/cors"
+// 	"golang.org/x/exp/slog"
+// )
 
-type ConfiguredHttpServer struct {
-	srv  *http.Server
-	repo *repo.RentalRepository
-}
+// func ConfigureHttpServer(
+// 	http_config *cfg.HTTP,
+// 	usecase *usecase.RentalUseCase,
+// ) *http.Server {
 
-func ConfigureHttpServer(
-	http_config *cfg.HTTP,
-	repo *repo.RentalRepository,
-	usecase *usecase.RentalUseCase,
-) *ConfiguredHttpServer {
+// 	slog.Info("Configuring the HTTP Server\n")
 
-	server := server.New(http_config)
-	filmHandler := handling.New(usecase)
-	apiHandler := NewHttpHandler(filmHandler)
+// 	filmHandler := film_handling.New(usecase)
 
-	mux := http.NewServeMux()
-	mux.Handle("/films", apiHandler)
+// 	apiHandler := NewHttpHandler(filmHandler)
 
-	server.Handler = mux
+// 	configuredHandler := cors.New(
+// 		cors.Options{
+// 			AllowedOrigins:   []string{"*"},
+// 			AllowOriginFunc:  func(origin string) bool { return true },
+// 			AllowCredentials: true,
+// 			ExposedHeaders:   []string{"Content-Length", "ETag", "Link", "X-RateLimit-Limit", "X-RateLimit-Remaining"},
+// 			Debug:            true,
+// 		},
+// 	).Handler(apiHandler)
 
-	return &ConfiguredHttpServer{
-		srv:  server,
-		repo: repo,
-	}
-}
+// 	mux := http.NewServeMux()
+// 	mux.Handle("/films", configuredHandler)
 
-func (s *ConfiguredHttpServer) Start() error {
-	err := s.srv.ListenAndServe()
-	if err != nil {
-		return err
-	}
-	slog.Info(fmt.Sprintf(color.Yellow+"Server is being launched on port %v..."+color.Reset, s.srv.Addr))
-	return nil
-}
+// 	return &http.Server{
+// 		Addr:    http_config.Host + ":" + http_config.Port,
+// 		Handler: mux,
+// 	}
+// }

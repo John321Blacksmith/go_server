@@ -8,11 +8,14 @@ package app
 import (
 	"fmt"
 	cfg "media_api/config"
-	http_cfg "media_api/internal/adapter/delivery/http"
+
+	// http_cfg "media_api/internal/adapter/delivery/http"
+	film_handler "media_api/internal/adapter/delivery/http/handler"
 	pg_repo "media_api/internal/adapter/repo/persistent"
 	rental_usecase "media_api/internal/usecase"
 	color "media_api/pkg"
 	pg_driver "media_api/pkg/postgres"
+	"net/http"
 
 	"golang.org/x/exp/slog"
 )
@@ -37,7 +40,7 @@ func Run(cfg *cfg.Config) error {
 		),
 	)
 	if err != nil {
-		return fmt.Errorf(color.Red+"error occurred while connecting to the DB:"+color.Reset+"%w\n", err)
+		return fmt.Errorf(color.Red+"error occurred while connecting to the DB:"+color.Reset+"%w", err)
 	}
 	defer func() {
 		pg.Close()
@@ -45,22 +48,36 @@ func Run(cfg *cfg.Config) error {
 
 	// repository startup
 	rentalRepo := pg_repo.NewRepository(pg)
-	// usecase startup
-	rentalUsecase := rental_usecase.New(rentalRepo)
 
-	// configuring and initialization
-	// of the HTTP server
-	server := http_cfg.ConfigureHttpServer(
-		&cfg.HTTP,
-		rentalRepo,
-		rentalUsecase,
-	)
+	// usecase startup
+	rentalUseCase := rental_usecase.New(rentalRepo)
+
+	// create a mux object
+	mux := http.NewServeMux()
+
+	// implement a filmHandler
+	filmHandler := film_handler.New(rentalUseCase)
+
+	// map handlers to the url patterns in MUX
+	mux.Handle("/films", filmHandler)
+	mux.Handle("/film", filmHandler)
+
+	// launch the server with the MUX configured
+	http.ListenAndServe("localhost:8080", mux)
+	// // configuring and initialization
+	// // of the HTTP server
+	// server := http_cfg.ConfigureHttpServer(
+	// 	&cfg.HTTP,
+	// 	rentalUseCase,
+	// )
 
 	// server launch
-	err = server.Start()
-	if err != nil {
-		return fmt.Errorf(color.Red+"error starting the server:"+color.Reset+"%w\n", err)
-	}
+	// err = server.ListenAndServe()
+
+	// slog.Info(fmt.Sprintf(color.Yellow+"Server is being launched on port %v..."+color.Reset, cfg.HTTP.Host+":"+cfg.HTTP.Port))
+	// if err != nil {
+	// 	return fmt.Errorf(color.Red+"error starting the server:"+color.Reset+"%w", err)
+	// }
 	slog.Info(color.Green+"Server started on address"+color.Reset+color.Magenta+"%v"+color.Reset+"\n", cfg.HTTP.Host+":"+cfg.HTTP.Port)
 	return nil
 }

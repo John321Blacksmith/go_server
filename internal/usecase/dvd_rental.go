@@ -7,6 +7,8 @@ import (
 	"context"
 	pg_repo "media_api/internal/adapter/repo/persistent"
 	"media_api/internal/entity"
+
+	"golang.org/x/exp/slog"
 )
 
 // define a structure
@@ -18,6 +20,7 @@ type RentalUseCase struct {
 // initialize a new
 // usecase
 func New(repo *pg_repo.RentalRepository) *RentalUseCase {
+	slog.Info("Creation of the Rental UseCase\n")
 	return &RentalUseCase{repo}
 }
 
@@ -25,16 +28,18 @@ func New(repo *pg_repo.RentalRepository) *RentalUseCase {
 // for the usecase
 
 // Film -.
-func (uc *RentalUseCase) GetFilmById(ctx context.Context, id int) (entity.Film, error) {
+func (uc *RentalUseCase) GetFilmById(ctx context.Context, id string) (entity.FilmObject, error) {
+	slog.Info("Rental Usecase: - GetFilmObject controller is acting...")
 	film, err := uc.pg_repo.GetFilmById(ctx, id)
 	if err != nil {
-		return entity.Film{}, err
+		return entity.FilmObject{}, err
 	}
 	return film, nil
 }
 
 // Film list -.
-func (uc *RentalUseCase) GetFilmsList(ctx context.Context) ([]entity.Film, error) {
+func (uc *RentalUseCase) GetFilmsList(ctx context.Context) ([]entity.FilmList, error) {
+	slog.Info("Rental Usecase: - GetFilmsList controller is acting...")
 	films, err := uc.pg_repo.GetFilmsList(ctx)
 	if err != nil {
 		return nil, err

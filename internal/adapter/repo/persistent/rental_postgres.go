@@ -8,6 +8,8 @@ import (
 	"fmt"
 
 	"media_api/internal/entity"
+
+	"golang.org/x/exp/slog"
 )
 
 // db repository
@@ -25,8 +27,9 @@ func NewRepository(db *sql.DB) *RentalRepository {
 // repository
 
 // Film -.
-func (repo *RentalRepository) GetFilmById(ctx context.Context, id int) (entity.Film, error) {
-	film := entity.Film{}
+func (repo *RentalRepository) GetFilmById(ctx context.Context, id string) (entity.FilmObject, error) {
+	slog.Info("Rental Reposiory: - GetFilmObject procedure is acting...")
+	film := entity.FilmObject{}
 	const query = `
 		SELECT
 			*
@@ -52,14 +55,15 @@ func (repo *RentalRepository) GetFilmById(ctx context.Context, id int) (entity.F
 		&film.SpecialFeatures,
 	)
 	if err != nil {
-		return entity.Film{}, fmt.Errorf("error occurred while getting DB data: %w", err)
+		return entity.FilmObject{}, fmt.Errorf("error occurred while getting DB data: %w", err)
 	}
 	return film, nil
 }
 
 // Film list -.
-func (repo *RentalRepository) GetFilmsList(ctx context.Context) ([]entity.Film, error) {
-	films := []entity.Film{}
+func (repo *RentalRepository) GetFilmsList(ctx context.Context) ([]entity.FilmList, error) {
+	slog.Info("Rental Reposiory: - GetFilmsList procedure is acting...")
+	films := []entity.FilmList{}
 	const query = `
 		SELECT
 			film_id,
@@ -82,7 +86,7 @@ func (repo *RentalRepository) GetFilmsList(ctx context.Context) ([]entity.Film, 
 	defer result.Close()
 
 	for result.Next() {
-		film := entity.Film{}
+		film := entity.FilmList{}
 		result.Scan(
 			&film.FilmId,
 			&film.Title,

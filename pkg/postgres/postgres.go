@@ -40,7 +40,7 @@ func NewDB(url string) (*sql.DB, error) {
 	if err != nil {
 		slog.Info("PING: DB unavailable")
 	} else {
-		slog.Info("\033[32m:DB connection established \033[0m \n")
+		slog.Info("\033[32mDB connection established \033[0m \n")
 	}
 
 	return db, err

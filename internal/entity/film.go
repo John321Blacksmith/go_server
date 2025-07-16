@@ -2,7 +2,7 @@ package entity
 
 import "time"
 
-type Film struct {
+type FilmObject struct {
 	FilmId          int
 	Title           string
 	Description     string
@@ -15,4 +15,12 @@ type Film struct {
 	Rating          float32
 	LastUpdate      time.Time
 	SpecialFeatures string
+}
+
+type FilmList struct {
+	FilmId      int
+	Title       string
+	ReleaseYear int
+	Length      int
+	Rating      float32
 }
