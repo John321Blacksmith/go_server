@@ -6,13 +6,13 @@ type FilmObject struct {
 	FilmId          int
 	Title           string
 	Description     string
-	ReleaseYear     time.Time
+	ReleaseYear     int
 	LanguageId      int
 	RentalDuration  time.Duration
-	RentalRate      int
+	RentalRate      float32
 	Length          int
-	ReplacementCost int
-	Rating          float32
+	ReplacementCost float32
+	Rating          []uint8
 	LastUpdate      time.Time
 	SpecialFeatures string
 }
@@ -22,5 +22,5 @@ type FilmList struct {
 	Title       string
 	ReleaseYear int
 	Length      int
-	Rating      float32
+	Rating      []uint8
 }

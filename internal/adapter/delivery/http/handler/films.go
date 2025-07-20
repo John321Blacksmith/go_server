@@ -3,22 +3,15 @@ package handler
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log/slog"
 	usecase "media_api/internal/usecase"
 	"net/http"
 )
 
-type FilmHandlerInterface interface {
-	GetFilmById(w http.ResponseWriter, r *http.Request)
-	GetFilmsList(w http.ResponseWriter, r *http.Request)
-
-	http.Handler
-}
-
+// it should imitate the http.Handler properties
 type FilmHandler struct {
 	usecase *usecase.RentalUseCase
-
-	FilmHandlerInterface
 }
 
 func prepareMessage(msg any) []byte {
@@ -37,33 +30,28 @@ func New(uc *usecase.RentalUseCase) *FilmHandler {
 	}
 }
 
-func (h *FilmHandler) GetFilmsList(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
-		filmsList, err := h.usecase.GetFilmsList(context.Background())
-		if err == nil {
-			w.WriteHeader(200)
-			w.Write(prepareMessage(filmsList))
-		} else {
-			w.WriteHeader(404)
-			w.Write(prepareMessage("No Content Found"))
+func (h *FilmHandler) GetFilmsList() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		films, err := h.usecase.GetFilmsList(context.Background())
+		if err != nil {
+			w.WriteHeader(500)
+			w.Write(prepareMessage(fmt.Sprintf("Something wrong has happened: %v", err)))
 		}
-	} else {
-		w.WriteHeader(405)
-		w.Write(prepareMessage("Method Not Allowed"))
-	}
+		w.WriteHeader(200)
+		w.Write(prepareMessage(films))
+	})
 }
 
-func (h *FilmHandler) GetFilmById(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
-		id := r.URL.Query().Get("id")
-		film, err := h.usecase.GetFilmById(context.Background(), id)
+func (h *FilmHandler) GetFilmById() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var pk string
+		pk = r.URL.Query().Get("pk")
+		film, err := h.usecase.GetFilmById(context.Background(), pk)
 		if err != nil {
-			w.WriteHeader(404)
-			w.Write(prepareMessage("No Content Found"))
+			w.WriteHeader(500)
+			w.Write(prepareMessage(fmt.Sprintf("Some problems have occurred: %v", err)))
 		}
 		w.WriteHeader(200)
 		w.Write(prepareMessage(film))
-	} else {
-		w.WriteHeader(405)
-	}
+	})
 }

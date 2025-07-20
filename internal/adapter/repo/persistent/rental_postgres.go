@@ -27,12 +27,23 @@ func NewRepository(db *sql.DB) *RentalRepository {
 // repository
 
 // Film -.
-func (repo *RentalRepository) GetFilmById(ctx context.Context, id string) (entity.FilmObject, error) {
+func (repo *RentalRepository) GetFilmById(ctx context.Context, id int) (entity.FilmObject, error) {
 	slog.Info("Rental Reposiory: - GetFilmObject procedure is acting...")
 	film := entity.FilmObject{}
 	const query = `
 		SELECT
-			*
+			film_id,
+			title,
+			description,
+			release_year,
+			language_id,
+			rental_duration,
+			rental_rate,
+			length,
+			replacement_cost,
+			rating,
+			last_update,
+			special_features
 		FROM
 			film
 		WHERE

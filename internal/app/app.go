@@ -10,7 +10,7 @@ import (
 	cfg "media_api/config"
 
 	// http_cfg "media_api/internal/adapter/delivery/http"
-	film_handler "media_api/internal/adapter/delivery/http/handler"
+	// film_handler "media_api/internal/adapter/delivery/http/handler"
 	pg_repo "media_api/internal/adapter/repo/persistent"
 	rental_usecase "media_api/internal/usecase"
 	color "media_api/pkg"
@@ -21,7 +21,7 @@ import (
 )
 
 // this function implements
-// injection of such depemdencies
+// injection of such dependencies
 // as message broker, http server,
 // usecases and DB repositories
 func Run(cfg *cfg.Config) error {
@@ -56,14 +56,17 @@ func Run(cfg *cfg.Config) error {
 	mux := http.NewServeMux()
 
 	// implement a filmHandler
-	filmHandler := film_handler.New(rentalUseCase)
+	// filmHandler := film_handler.New(rentalUseCase)
 
 	// map handlers to the url patterns in MUX
-	mux.Handle("/films", filmHandler)
-	mux.Handle("/film", filmHandler)
 
 	// launch the server with the MUX configured
-	http.ListenAndServe("localhost:8080", mux)
+	// http.ListenAndServe("localhost:8080", mux)
+
+	server := http.Server{
+		Addr:    cfg.HTTP.Host + ":" + cfg.HTTP.Port,
+		Handler: mux,
+	}
 	// // configuring and initialization
 	// // of the HTTP server
 	// server := http_cfg.ConfigureHttpServer(
@@ -72,7 +75,7 @@ func Run(cfg *cfg.Config) error {
 	// )
 
 	// server launch
-	// err = server.ListenAndServe()
+	err = server.ListenAndServe()
 
 	// slog.Info(fmt.Sprintf(color.Yellow+"Server is being launched on port %v..."+color.Reset, cfg.HTTP.Host+":"+cfg.HTTP.Port))
 	// if err != nil {
